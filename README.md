@@ -21,7 +21,7 @@
 集成好的可执行项目文件下载地址：[here](https://jbox.sjtu.edu.cn/l/P1qGE8) （交大云盘）\
 与`mediapipe-anime`相同，启动程序后，会自动创建名为`VirtualCamera`的虚拟摄像头，若视频仍无法正常显示，则需要手动运行/vc/Install.bat \
 也可通过`pyinstaller`打包：
-```angular2html
+```
 pip install pyinstaller
 pyinstaller -D -w -n "mediapipe-live2d" main.py --add-data "[虚拟环境路径]\Lib\site-packages\mediapipe\modules;mediapipe\modules" --add-data ".\vc;vc" --add-data ".\unity;unity"
 ```
