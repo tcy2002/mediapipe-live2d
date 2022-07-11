@@ -1,10 +1,10 @@
 import numpy as np
 import cv2
-from math import sin, cos, asin, radians, fabs, atan, degrees
+from math import cos, radians
 from typing import List
 
 import config
-from utils import avg_p, dist_p, angle, Point
+from utils import avg_p, dist_p, Point
 
 
 class PoseEstimator:

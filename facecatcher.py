@@ -84,7 +84,7 @@ class FaceCatcher:
         left = calc.eye_open(landmarks, True, z)
         right = calc.eye_open(landmarks, False, z)
         mouth = calc.mouth_open(landmarks)
-        return x, y, z, left, right, 0.0, 0.0, 0.0, 0.0, mouth, 0.0
+        return x, y, z, left, right, 0.5, 0.5, 0.5, 0.5, mouth, 0.0
 
     # 解析面部数据点
     def process_img(self, img):
@@ -101,5 +101,3 @@ class FaceCatcher:
                 landmarks.append(Point(x, y))
 
         return landmarks
-
-

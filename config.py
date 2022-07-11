@@ -2,6 +2,7 @@ unityAddr = '127.0.0.1'
 unityImagePort = 12345
 unityParamPort = 54321
 
+# 图像参数
 img_width = 640
 img_height = 480
 
@@ -11,6 +12,7 @@ size_of_float = 4
 min_detection_confidence = 0.75
 min_tracking_confidence = 0.75
 
+# live2d模型参数
 num_params = 11
 num_landmarks = 468
 
