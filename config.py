@@ -1,6 +1,6 @@
 unityAddr = '127.0.0.1'
-unityImagePort = 12345
-unityParamPort = 54321
+unityImagePort = 1234
+unityParamPort = 4321
 
 # 图像参数
 img_width = 640

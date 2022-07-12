@@ -33,7 +33,7 @@ class Translator:
         print('translator: connected to unity')
 
         while True:
-            data = conn.recv(32 * 1024)
+            data = conn.recv(64 * 1024)
             if not data or data == 'exit':
                 break
 
