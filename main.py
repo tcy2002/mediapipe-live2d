@@ -2,8 +2,8 @@ import multiprocessing
 from multiprocessing import Process
 import subprocess
 
-from translator import Translator
-from facecatcher import FaceCatcher
+from videocapture import VideoCapture
+from facetracker import FaceTracker
 
 
 def Unity():
@@ -11,7 +11,7 @@ def Unity():
 
 
 def Mediapipe():
-    catcher = FaceCatcher()
+    catcher = FaceTracker()
     catcher.run()
 
 
@@ -24,7 +24,7 @@ if __name__ == '__main__':
     p2 = Process(target=Mediapipe)
     p2.start()
 
-    translator = Translator()
+    translator = VideoCapture()
     translator.run()
 
     p1.join()

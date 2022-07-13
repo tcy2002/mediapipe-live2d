@@ -9,17 +9,9 @@ import time
 import config
 
 
-class Translator:
+class VideoCapture:
     def __init__(self):
-        try:
-            self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            self.server.bind((config.unityAddr, config.unityImagePort))
-            self.server.listen(1)
-        except socket.error as e:
-            print('translator: ' + str(e))
-            sys.exit(1)
-
+        self.initTcp()
         self.install_webcam()
 
     def __del__(self):
@@ -27,13 +19,33 @@ class Translator:
         self.webcam.close()
         print('translator: connection closed')
 
+    def initTcp(self):
+        self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        failing_time = 0
+        port = config.unityImagePort
+        while True:
+            try:
+                self.server.bind((config.unityAddr, config.unityImagePort))
+                self.server.listen(1)
+                print('translator is listening, port: %d' % port)
+                break
+            except socket.error as e:
+                failing_time += 1
+                time.sleep(0.1)
+                if failing_time % 5 == 0:
+                    port += 1
+                if failing_time > 25:
+                    print('translator: ' + str(e))
+                    sys.exit(1)
+
     def run(self):
         print('translator: waiting for connection')
         conn, addr = self.server.accept()
         print('translator: connected to unity')
 
         while True:
-            data = conn.recv(64 * 1024)
+            data = conn.recv(16 * 1024)
             if not data or data == 'exit':
                 break
 
@@ -41,8 +53,12 @@ class Translator:
 
             if img is not None:
                 img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-                self.webcam.send(img)
-                self.webcam.sleep_until_next_frame()
+                try:
+                    self.webcam.send(img)
+                    self.webcam.sleep_until_next_frame()
+                except Exception:
+                    print('translator: fail to post image to virtual camera')
+                    break
 
     def install_webcam(self):
         try:

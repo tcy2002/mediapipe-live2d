@@ -8,8 +8,8 @@ from utils import avg_p, dist_p, Point
 
 
 class PoseEstimator:
-    def __init__(self, img_size=(config.img_width, config.img_height)):
-        self.size = img_size
+    def __init__(self):
+        self.size = (640, 480)
 
         self.model_points_full = self.get_full_model_points()
 
