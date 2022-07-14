@@ -21,11 +21,13 @@ if __name__ == '__main__':
     p1 = Process(target=Unity)
     p1.start()
 
-    p2 = Process(target=Mediapipe)
-    p2.start()
+    # p2 = Process(target=Mediapipe)
+    # p2.start()
 
-    translator = VideoCapture()
-    translator.run()
+    Mediapipe()
+
+    # translator = VideoCapture()
+    # translator.run()
 
     p1.join()
-    p2.join()
+    # p2.join()

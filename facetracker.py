@@ -1,6 +1,5 @@
 import socket
 import sys
-import time
 
 from mediapipe.python.solutions import face_mesh
 import cv2
@@ -32,7 +31,7 @@ class FaceTracker:
 
     def __del__(self):
         self.cam.release()
-        print('catcher: tracking terminated')
+        print('tracker: tracking terminated')
 
     def initTcp(self):
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -41,23 +40,23 @@ class FaceTracker:
         while True:
             try:
                 self.server.connect((config.unityAddr, port))
-                print('catcher: connected to unity, port: %d' % port)
+                print('tracker: connected to unity, port: %d' % port)
                 break
             except OSError as e:
                 failing_time += 1
-                time.sleep(0.1)
-                if failing_time % 5 == 0:
-                    port += 1
-                if failing_time > 25:
-                    print('catcher: ' + str(e))
-                    sys.exit(1)
+                port += 1
+                if failing_time >= 3:
+                    port -= 3
+                if failing_time >= 6:
+                    print('tracker: fail to connect to unity')
+                    sys.exit(0)
 
     # 启动本机摄像头，读取图像
     def run(self):
         while self.cam.isOpened():
             success, img = self.cam.read()
             if not success:
-                print('catcher: ignoring empty frame')
+                print('tracker: ignoring empty frame')
                 continue
 
             landmarks = self.process_img(img)
@@ -66,8 +65,9 @@ class FaceTracker:
                 msg = '%.4f ' * config.num_params % params
                 try:
                     self.server.send(bytes(msg, "utf-8"))
-                except socket.error as e:
-                    sys.exit(1)
+                except socket.error:
+                    print('tracker: fail to post parameters to unity')
+                    sys.exit(0)
 
     # 翻译数据
     def translate_to_live2d(self, landmarks):
