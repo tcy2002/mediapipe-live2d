@@ -1,12 +1,7 @@
+# Unity参数
 unityAddr = '127.0.0.1'
-unityImagePort = 12345
-unityParamPort = 54321
-
+unityPort = 54321
 unityPath = '.\\unity\\live2d.exe'
-
-# 图像参数
-img_width = 320
-img_height = 320
 
 size_of_float = 4
 

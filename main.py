@@ -1,8 +1,10 @@
 import multiprocessing
 from multiprocessing import Process
 import subprocess
+import pyvirtualcam as pv
+import os
+import time
 
-from videocapture import VideoCapture
 from facetracker import FaceTracker
 
 
@@ -10,9 +12,23 @@ def Unity():
     subprocess.run(".\\unity\\live2d.exe")
 
 
-def Mediapipe():
-    catcher = FaceTracker()
-    catcher.run()
+def install_webcam():
+    try:
+        cam = pv.Camera(width=640, height=480, fps=30, device='VirtualCamera')
+        cam.close()
+    except RuntimeError:
+        os.system('.\\vc\\Install.bat')
+        failing_time = 0
+        while True:
+            try:
+                cam = pv.Camera(width=640, height=480, fps=30, device='VirtualCamera')
+                cam.close()
+                break
+            except RuntimeError:
+                failing_time += 1
+                if failing_time > 5:
+                    raise RuntimeError('capture: fail to install webcam')
+                time.sleep(0.5)
 
 
 if __name__ == '__main__':
@@ -21,13 +37,8 @@ if __name__ == '__main__':
     p1 = Process(target=Unity)
     p1.start()
 
-    # p2 = Process(target=Mediapipe)
-    # p2.start()
-
-    Mediapipe()
-
-    # translator = VideoCapture()
-    # translator.run()
+    install_webcam()
+    catcher = FaceTracker()
+    catcher.run()
 
     p1.join()
-    # p2.join()

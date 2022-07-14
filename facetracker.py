@@ -30,24 +30,22 @@ class FaceTracker:
         self.initTcp()
 
     def __del__(self):
+        self.server.close()
         self.cam.release()
         print('tracker: tracking terminated')
 
     def initTcp(self):
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         failing_time = 0
-        port = config.unityParamPort
+        port = config.unityPort
         while True:
             try:
                 self.server.connect((config.unityAddr, port))
                 print('tracker: connected to unity, port: %d' % port)
                 break
-            except OSError as e:
+            except OSError:
                 failing_time += 1
-                port += 1
-                if failing_time >= 3:
-                    port -= 3
-                if failing_time >= 6:
+                if failing_time >= 5:
                     print('tracker: fail to connect to unity')
                     sys.exit(0)
 
