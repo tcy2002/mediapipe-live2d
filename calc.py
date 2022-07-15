@@ -65,7 +65,7 @@ class PoseEstimator:
 
 
 # 计算嘴部开合状态
-def mouth_open(landmarks):
+def mouth_open(landmarks, yaw):
     h_left = dist_p(landmarks[38], landmarks[86])
     h_right = dist_p(landmarks[268], landmarks[316])
     h_avg = (h_right + h_left) / 2
@@ -74,7 +74,7 @@ def mouth_open(landmarks):
     w_below = dist_p(landmarks[96], landmarks[325])
     w_avg = (w_below + w_above) / 2
 
-    normalized = h_avg / w_avg
+    normalized = h_avg / w_avg / cos(radians(yaw))
     return linear_scale(normalized,
                         config.mouthClosedThreshold,
                         config.mouthOpenThreshold,
@@ -90,7 +90,6 @@ def eye_open(landmarks, left_right, pitch, yaw):
                        landmarks[263], landmarks[373], landmarks[380]])
 
     corr_ratio = ratio / cos(radians(yaw)) * cos(radians(pitch))
-    print(corr_ratio)
 
     return linear_scale(corr_ratio,
                         config.eyeClosedThreshold,
@@ -111,7 +110,6 @@ def eye_ratio(points):
     width = dist_p(points[0], points[3])
     h1 = dist_p(points[1], points[5])
     h2 = dist_p(points[2], points[4])
-
     return (h1 + h2) / (2 * width)
 
 

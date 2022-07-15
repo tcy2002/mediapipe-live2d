@@ -13,7 +13,6 @@ from stabilizer import Stabilizer
 
 class FaceTracker:
     def __init__(self):
-        self.cam = cv2.VideoCapture(0, cv2.CAP_DSHOW)
         self.face_mesh = face_mesh.FaceMesh(
             False, 1, True,
             config.min_detection_confidence,
@@ -25,7 +24,9 @@ class FaceTracker:
             cov_process=0.1,
             cov_measure=0.1) for _ in range(6)]
         self.pose_estimator = calc.PoseEstimator()
+        self.params = 0.0, 0.0, 0.0, 1.0, 1.0, 0.5, 0.5, 0.5, 0.5, 0.0, 0.0
 
+        self.openCamera()
         self.initTcp()
 
     def __del__(self):
@@ -48,25 +49,34 @@ class FaceTracker:
                     print('tracker: fail to connect to unity')
                     sys.exit(0)
 
+    def openCamera(self):
+        try:
+            self.cam = cv2.VideoCapture(0)
+            print('tracker: camera is open')
+        except Exception:
+            print('tracker: fail to open camera')
+
     # 启动本机摄像头，读取图像
     def run(self):
         while self.cam.isOpened():
+            msg = '%.4f ' * config.num_params % self.params
+            try:
+                self.server.send(bytes(msg, "utf-8"))
+            except socket.error:
+                print('tracker: connection is closed by unity')
+                sys.exit(0)
+
             success, img = self.cam.read()
             if not success:
-                print('tracker: ignoring empty frame')
+                self.openCamera()
+                print('tracker: try to reopen camera')
                 continue
 
             landmarks = self.process_img(img)
             if len(landmarks) != 0:
                 if not calc.head_valid(landmarks):
                     continue
-                params = self.translate_to_live2d(landmarks)
-                msg = '%.4f ' * config.num_params % params
-                try:
-                    self.server.send(bytes(msg, "utf-8"))
-                except socket.error:
-                    print('tracker: fail to post parameters to unity')
-                    sys.exit(0)
+                self.params = self.translate_to_live2d(landmarks)
 
     # 翻译数据
     def translate_to_live2d(self, landmarks):
@@ -86,7 +96,7 @@ class FaceTracker:
 
         left = calc.eye_open(landmarks, True, pitch, yaw)
         right = calc.eye_open(landmarks, False, pitch, yaw)
-        mouth = calc.mouth_open(landmarks)
+        mouth = calc.mouth_open(landmarks, yaw)
 
         return roll, pitch, yaw, left, right, 0.5, 0.5, 0.5, 0.5, mouth, 0.0
 

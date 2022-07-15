@@ -23,7 +23,7 @@ num_landmarks = 468
 
 # 嘴部阈值
 mouthClosedThreshold = 0.1
-mouthOpenThreshold = 0.8
+mouthOpenThreshold = 0.6
 
 # 面部阈值
 faceYAngleXRotCorrection = 0.15
