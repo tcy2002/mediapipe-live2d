@@ -1,15 +1,14 @@
 import numpy as np
 import cv2
 from math import cos, radians
-from typing import List
 
 import config
-from utils import avg_p, dist_p, Point
+from utils import avg_p, dist_p
 
 
 class PoseEstimator:
     def __init__(self):
-        self.size = (640, 480)
+        self.size = (config.cam_width, config.cam_height)
 
         self.model_points_full = self.get_full_model_points()
 
@@ -66,7 +65,7 @@ class PoseEstimator:
 
 
 # 计算嘴部开合状态
-def mouth_open(landmarks: List[Point]):
+def mouth_open(landmarks):
     h_left = dist_p(landmarks[38], landmarks[86])
     h_right = dist_p(landmarks[268], landmarks[316])
     h_avg = (h_right + h_left) / 2
@@ -83,14 +82,15 @@ def mouth_open(landmarks: List[Point]):
 
 
 # 计算眼睛的开闭状态
-def eye_open(landmarks: List[Point], left_right, y_ang):
+def eye_open(landmarks, left_right, pitch, yaw):
     ratio = eye_ratio([landmarks[33], landmarks[160], landmarks[158],
                        landmarks[133], landmarks[153], landmarks[144]]
                       if left_right else
                       [landmarks[362], landmarks[385], landmarks[387],
                        landmarks[263], landmarks[373], landmarks[380]])
 
-    corr_ratio = ratio / cos(radians(y_ang))
+    corr_ratio = ratio / cos(radians(yaw)) * cos(radians(pitch))
+    print(corr_ratio)
 
     return linear_scale(corr_ratio,
                         config.eyeClosedThreshold,
@@ -98,7 +98,7 @@ def eye_open(landmarks: List[Point], left_right, y_ang):
 
 
 # 计算眼睛位置
-def eye(landmarks: List[Point]):
+def eye(landmarks):
     eye1 = avg_p([landmarks[33], landmarks[160], landmarks[158],
                   landmarks[133], landmarks[153], landmarks[144]])
     eye2 = avg_p([landmarks[362], landmarks[385], landmarks[387],
@@ -107,12 +107,22 @@ def eye(landmarks: List[Point]):
 
 
 # 计算眼睛的长宽比例
-def eye_ratio(points: List[Point]):
+def eye_ratio(points):
     width = dist_p(points[0], points[3])
     h1 = dist_p(points[1], points[5])
     h2 = dist_p(points[2], points[4])
 
     return (h1 + h2) / (2 * width)
+
+
+# 计算整体位置
+def head_valid(landmarks):
+    centre = avg_p([landmarks[10], landmarks[4], landmarks[152],
+                    landmarks[227], landmarks[323]])
+    w_ratio = centre[0] / config.cam_width
+    h_ratio = centre[1] / config.cam_height
+    return (config.w_ratio_min <= w_ratio <= config.w_ratio_max) and \
+           (config.h_ratio_min <= h_ratio <= config.h_ratio_max)
 
 
 # 线性比例

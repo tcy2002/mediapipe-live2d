@@ -1,36 +1,22 @@
 from math import hypot, pow, acos
 
-from typing import List
 
-
-class Point:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
-    def __add__(self, other):
-        return Point(self.x + other.x, self.y + other.y)
-
-    def __truediv__(self, n):
-        return Point(self.x / n, self.y / n)
-
-
-def sum_p(args: List[Point]):
-    ans = Point(0, 0)
+def sum_p(args):
+    ans = [0, 0]
     for p in args:
-        ans += p
+        ans[0] += p[0]
+        ans[1] += p[1]
     return ans
 
 
-def avg_p(args: List[Point]):
+def avg_p(args):
     size = len(args)
-    if size == 0:
-        return Point(0, 0)
-    return sum_p(args) / size
+    avg = sum_p(args)
+    return [avg[0] / size, avg[1] / size]
 
 
-def dist_p(p1: Point, p2: Point):
-    return hypot(p1.x - p2.x, p1.y - p2.y)
+def dist_p(p1, p2):
+    return hypot(p1[0] - p2[0], p1[1] - p2[1])
 
 
 def square(n1):

@@ -8,7 +8,6 @@ from numpy import degrees, clip
 
 import calc
 import config
-from utils import Point
 from stabilizer import Stabilizer
 
 
@@ -59,6 +58,8 @@ class FaceTracker:
 
             landmarks = self.process_img(img)
             if len(landmarks) != 0:
+                if not calc.head_valid(landmarks):
+                    continue
                 params = self.translate_to_live2d(landmarks)
                 msg = '%.4f ' * config.num_params % params
                 try:
@@ -69,9 +70,7 @@ class FaceTracker:
 
     # 翻译数据
     def translate_to_live2d(self, landmarks):
-        image_points = np.zeros((config.num_landmarks, 2))
-        for i in range(config.num_landmarks):
-            image_points[i, :] = landmarks[i].x, landmarks[i].y
+        image_points = np.array(landmarks[:config.num_landmarks])
         pose = self.pose_estimator.xyz_pose(image_points)
         pose_np = np.array(pose).flatten()
 
@@ -84,9 +83,11 @@ class FaceTracker:
         roll = clip(degrees(steady_pose[0][1]), -90, 90)
         pitch = clip(-(180 + degrees(steady_pose[0][0])), -90, 90)
         yaw = clip(degrees(steady_pose[0][2]), -90, 90)
-        left = calc.eye_open(landmarks, True, yaw)
-        right = calc.eye_open(landmarks, False, yaw)
+
+        left = calc.eye_open(landmarks, True, pitch, yaw)
+        right = calc.eye_open(landmarks, False, pitch, yaw)
         mouth = calc.mouth_open(landmarks)
+
         return roll, pitch, yaw, left, right, 0.5, 0.5, 0.5, 0.5, mouth, 0.0
 
     # 解析面部数据点
@@ -101,6 +102,6 @@ class FaceTracker:
             total_landmarks = results.multi_face_landmarks[0]
             for idx, landmark in enumerate(total_landmarks.landmark):
                 x, y = landmark.x * w, landmark.y * h
-                landmarks.append(Point(x, y))
+                landmarks.append([x, y])
 
         return landmarks
