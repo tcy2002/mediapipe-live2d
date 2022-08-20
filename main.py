@@ -5,6 +5,7 @@ import pyvirtualcam as pv
 import os
 import time
 
+import config
 from facetracker import FaceTracker
 
 
@@ -32,6 +33,7 @@ def install_webcam():
 
 
 if __name__ == '__main__':
+    os.chdir(config.root)
     multiprocessing.freeze_support()
 
     p1 = Process(target=Unity)

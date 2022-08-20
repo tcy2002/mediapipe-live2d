@@ -1,3 +1,8 @@
+import os
+
+# 程序根目录
+root = os.path.abspath(os.path.dirname(__file__))
+
 # Unity参数
 unityAddr = '127.0.0.1'
 unityPort = 54321
