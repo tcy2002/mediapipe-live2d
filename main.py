@@ -7,6 +7,7 @@ import time
 
 import config
 from facetracker import FaceTracker
+from checker import Checker
 
 
 def Unity():
@@ -35,6 +36,7 @@ def install_webcam():
 if __name__ == '__main__':
     os.chdir(config.root)
     multiprocessing.freeze_support()
+    chk = Checker(config.addr, config.port)
 
     p1 = Process(target=Unity)
     p1.start()

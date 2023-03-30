@@ -3,9 +3,13 @@ import os
 # 程序根目录
 root = os.path.abspath(os.path.dirname(__file__))
 
+# 为确保只有一个实例运行，监听一个端口
+addr = '127.0.0.1'
+port = 60000
+
 # Unity参数
 unityAddr = '127.0.0.1'
-unityPort = 54321
+unityPort = 60001
 unityPath = '.\\unity\\live2d.exe'
 
 size_of_float = 4

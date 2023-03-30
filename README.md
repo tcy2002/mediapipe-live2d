@@ -23,7 +23,7 @@
 也可通过`pyinstaller`打包：
 ```
 pip install pyinstaller
-pyinstaller -D -w -n "mediapipe-live2d" main.py --add-data "[虚拟环境路径]\Lib\site-packages\mediapipe\modules;mediapipe\modules" --add-data ".\vc;vc" --add-data ".\unity;unity" --add-data ".\model.dat;."
+pyinstaller -D -w -n "mediapipe-live2d" -i logo.ico main.py --add-data "[虚拟环境路径]\Lib\site-packages\mediapipe\modules;mediapipe\modules" --add-data ".\vc;vc" --add-data ".\unity;unity" --add-data ".\model.dat;."
 ```
 可在web端启动mediapipe-live2d.exe，然后调用虚拟摄像头`VirtualCamera`
 
